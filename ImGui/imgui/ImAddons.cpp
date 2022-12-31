@@ -1,17 +1,28 @@
 /*
 This is a simple items addons for Dear ImGui
-Credits: 
+Credits:
 SADFI2259X: Main creator
 HankiDesign: Awesome Dear ImGui
 */
 
 #include "ImAddons.h"
 
-#include "imgui.h"
-#include "imgui_internal.h"
+bool ImAdd::LoadTextureFromFile(const char* filename, PDIRECT3DTEXTURE9* out_texture, int* out_width, int* out_height)
+{
+    // Load texture from disk
+    PDIRECT3DTEXTURE9 texture;
+    HRESULT hr = D3DXCreateTextureFromFileA(g_pd3dDevice, filename, &texture);
+    if (hr != S_OK)
+        return false;
 
-#include <iostream>
-
+    // Retrieve description of the texture surface so we can access its size
+    D3DSURFACE_DESC my_image_desc;
+    texture->GetLevelDesc(0, &my_image_desc);
+    *out_texture = texture;
+    *out_width = (int)my_image_desc.Width;
+    *out_height = (int)my_image_desc.Height;
+    return true;
+}
 
 void ImAdd::ToggleButton(const char* str_id, bool* v, bool label)
 {
@@ -166,12 +177,12 @@ void ImAdd::ToggleButtonLabel(const char* str_id, const char* text, bool* v, boo
         ImGui::EndGroup();
     }
 }
-    
-bool ImAdd::ProgressBarBar(const char* label, float value,  const ImVec2& size_arg, const ImU32& bg_col, const ImU32& fg_col) {
+
+bool ImAdd::ProgressBarBar(const char* label, float value, const ImVec2& size_arg, const ImU32& bg_col, const ImU32& fg_col) {
     ImGuiWindow* window = ImGui::GetCurrentWindow();
     if (window->SkipItems)
         return false;
-        
+
     ImGuiContext& g = *GImGui;
     const ImGuiStyle& style = g.Style;
     const ImGuiID id = window->GetID(label);
@@ -179,33 +190,33 @@ bool ImAdd::ProgressBarBar(const char* label, float value,  const ImVec2& size_a
     ImVec2 pos = window->DC.CursorPos;
     ImVec2 size = size_arg;
     size.x -= style.FramePadding.x * 2;
-        
+
     const ImRect bb(pos, ImVec2(pos.x + size.x, pos.y + size.y));
     ImGui::ItemSize(bb, style.FramePadding.y);
     if (!ImGui::ItemAdd(bb, id))
         return false;
-        
+
     // Render
     const float circleStart = size.x * 0.7f;
     const float circleEnd = size.x;
     const float circleWidth = circleEnd - circleStart;
-        
+
     window->DrawList->AddRectFilled(bb.Min, ImVec2(pos.x + circleStart, bb.Max.y), bg_col);
-    window->DrawList->AddRectFilled(bb.Min, ImVec2(pos.x + circleStart*value, bb.Max.y), fg_col);
-    
+    window->DrawList->AddRectFilled(bb.Min, ImVec2(pos.x + circleStart * value, bb.Max.y), fg_col);
+
     /*
     const float t = g.Time;
     const float r = size.y / 2;
     const float speed = 1.5f;
-        
+
     const float a = speed*0;
     const float b = speed*0.333f;
     const float c = speed*0.666f;
-        
+
     const float o1 = (circleWidth+r) * (t+a - speed * (int)((t+a) / speed)) / speed;
     const float o2 = (circleWidth+r) * (t+b - speed * (int)((t+b) / speed)) / speed;
     const float o3 = (circleWidth+r) * (t+c - speed * (int)((t+c) / speed)) / speed;
-        
+
     window->DrawList->AddCircleFilled(ImVec2(pos.x + circleEnd - o1, bb.Min.y + r), r, bg_col);
     window->DrawList->AddCircleFilled(ImVec2(pos.x + circleEnd - o2, bb.Min.y + r), r, bg_col);
     window->DrawList->AddCircleFilled(ImVec2(pos.x + circleEnd - o3, bb.Min.y + r), r, bg_col);
@@ -216,34 +227,34 @@ bool ImAdd::Spinner(const char* label, float radius, int thickness, const ImU32&
     ImGuiWindow* window = ImGui::GetCurrentWindow();
     if (window->SkipItems)
         return false;
-        
+
     ImGuiContext& g = *GImGui;
     const ImGuiStyle& style = g.Style;
     const ImGuiID id = window->GetID(label);
-        
+
     ImVec2 pos = window->DC.CursorPos;
-    ImVec2 size((radius )*2, (radius + style.FramePadding.y)*2);
-        
+    ImVec2 size((radius) * 2, (radius + style.FramePadding.y) * 2);
+
     const ImRect bb(pos, ImVec2(pos.x + size.x, pos.y + size.y));
     ImGui::ItemSize(bb, style.FramePadding.y);
     if (!ImGui::ItemAdd(bb, id))
         return false;
-        
+
     // Render
     window->DrawList->PathClear();
-        
-    int num_segments = 30;
-    int start = abs(ImSin(g.Time*1.8f)*(num_segments-5));
-        
-    const float a_min = IM_PI*2.0f * ((float)start) / (float)num_segments;
-    const float a_max = IM_PI*2.0f * ((float)num_segments-3) / (float)num_segments;
 
-    const ImVec2 centre = ImVec2(pos.x+radius, pos.y+radius+style.FramePadding.y);
-        
+    int num_segments = 30;
+    int start = abs(ImSin(g.Time * 1.8f) * (num_segments - 5));
+
+    const float a_min = IM_PI * 2.0f * ((float)start) / (float)num_segments;
+    const float a_max = IM_PI * 2.0f * ((float)num_segments - 3) / (float)num_segments;
+
+    const ImVec2 centre = ImVec2(pos.x + radius, pos.y + radius + style.FramePadding.y);
+
     for (int i = 0; i < num_segments; i++) {
         const float a = a_min + ((float)i / (float)num_segments) * (a_max - a_min);
-        window->DrawList->PathLineTo(ImVec2(centre.x + ImCos(a+g.Time*8) * radius,
-                                            centre.y + ImSin(a+g.Time*8) * radius));
+        window->DrawList->PathLineTo(ImVec2(centre.x + ImCos(a + g.Time * 8) * radius,
+            centre.y + ImSin(a + g.Time * 8) * radius));
     }
 
     window->DrawList->PathStroke(color, false, thickness);

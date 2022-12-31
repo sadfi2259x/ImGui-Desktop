@@ -1,9 +1,1 @@
-﻿  main.cpp
-D:\things\sadfi2259x\user files\scripts\cpp\ImGui APP\ImGui\main.cpp(47,11): warning C4244: 'argument': conversion from 'const float' to 'int', possible loss of data
-D:\things\sadfi2259x\user files\scripts\cpp\ImGui APP\ImGui\main.cpp(47,11): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  Generating code
-  2 of 1239 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    19 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  ImGui.vcxproj -> D:\things\sadfi2259x\user files\scripts\cpp\ImGui APP\release\ImGui.exe
+﻿  ImGui.vcxproj -> D:\things\sadfi2259x\user files\scripts\cpp\ImGui Application\release\ImGui.exe
