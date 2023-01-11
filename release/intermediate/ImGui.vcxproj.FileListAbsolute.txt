@@ -1,3 +1,0 @@
-D:\things\sadfi2259x\user files\scripts\cpp\ImGui Application\release\intermediate\ImGui.vcxproj.MdMergeInputs.cache
-D:\things\sadfi2259x\user files\scripts\cpp\ImGui Application\release\intermediate\ImGui.vcxproj.cppwinrt_plat.cache
-D:\things\sadfi2259x\user files\scripts\cpp\ImGui Application\release\intermediate\ImGui.vcxproj.cppwinrt_comp.cache

@@ -1,0 +1,63 @@
+﻿  main.cpp
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(146,30): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(163,30): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(172,30): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(188,30): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(219,28): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(246,28): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(267,28): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(322,30): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(370,34): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(703,28): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(713,28): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(731,28): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(739,28): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(783,28): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(798,28): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(827,28): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(842,28): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(983,28): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(995,32): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1017,30): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1037,30): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1240,30): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1278,30): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1299,30): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1321,34): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1348,34): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1367,28): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1441,28): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1450,28): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1459,28): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1475,28): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1801,28): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1809,30): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1820): message : see reference to function template instantiation 'auto ImSpinner::SpinnerFlowingGradient::<lambda_1>::operator ()<ImSpinner::SpinnerFlowingGradient::<lambda_2>,ImSpinner::SpinnerFlowingGradient::<lambda_3>,ImSpinner::SpinnerFlowingGradient::<lambda_4>>(_T1,_T2,_T3) const' being compiled
+          with
+          [
+              _T1=ImSpinner::SpinnerFlowingGradient::<lambda_2>,
+              _T2=ImSpinner::SpinnerFlowingGradient::<lambda_3>,
+              _T3=ImSpinner::SpinnerFlowingGradient::<lambda_4>
+          ]
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1841,32): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1868,28): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1889,28): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(1917,34): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(2048,30): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(2074,34): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(2117,34): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(2158,30): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(2164,30): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(2349,30): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(2377,30): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(2462,34): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(2593,34): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(2610,27): warning C4018: '<': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\addons\imspinner.h(2615,34): warning C4018: '<=': signed/unsigned mismatch
+D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\OrkGui\main.cpp(70,19): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  Generating code
+  1 of 1308 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    18 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  OrkGui.vcxproj -> D:\things\sadfi2259x\user files\scripts\cpp\OrkGui\release\OrkGui.exe

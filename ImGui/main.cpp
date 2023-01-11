@@ -8,7 +8,7 @@
 
 #include "main.hpp"
 
-bool LoadTextureFromFile(const char* filename, PDIRECT3DTEXTURE9* out_texture, int* out_width, int* out_height)
+bool LoadTextureFromFile(const char* filename, PDIRECT3DTEXTURE9* out_texture)
 {
     // Load texture from disk
     PDIRECT3DTEXTURE9 texture;
@@ -20,9 +20,39 @@ bool LoadTextureFromFile(const char* filename, PDIRECT3DTEXTURE9* out_texture, i
     D3DSURFACE_DESC my_image_desc;
     texture->GetLevelDesc(0, &my_image_desc);
     *out_texture = texture;
-    *out_width = (int)my_image_desc.Width;
-    *out_height = (int)my_image_desc.Height;
     return true;
+}
+
+void RenderWindowBlur(HWND hwnd, bool boolean)
+{
+    struct ACCENTPOLICY
+    {
+        int na;
+        int nf;
+        int nc;
+        int nA;
+    };
+    struct WINCOMPATTRDATA
+    {
+        int na;
+        PVOID pd;
+        ULONG ul;
+    };
+
+    const HINSTANCE hm = LoadLibrary(L"user32.dll");
+    if (hm && boolean)
+    {
+        typedef BOOL(WINAPI* pSetWindowCompositionAttribute)(HWND, WINCOMPATTRDATA*);
+
+        const pSetWindowCompositionAttribute SetWindowCompositionAttribute = (pSetWindowCompositionAttribute)GetProcAddress(hm, "SetWindowCompositionAttribute");
+        if (SetWindowCompositionAttribute)
+        {
+            ACCENTPOLICY policy = { 3, 0, 0, 0 }; // and even works 4,0,155,0 (Acrylic blur)
+            WINCOMPATTRDATA data = { 19, &policy,sizeof(ACCENTPOLICY) };
+            SetWindowCompositionAttribute(hwnd, &data);
+        }
+        FreeLibrary(hm);
+    }
 }
 
 // Main code
@@ -35,12 +65,16 @@ int main(int, char**)
 
     // Create application window
     ImGui_ImplWin32_EnableDpiAwareness();
-    WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, L"ImGui Window", NULL };
+    WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, L"OrkGui Window", NULL };
     ::RegisterClassEx(&wc);
-    HWND hwnd = ::CreateWindow(wc.lpszClassName, L"Dear ImGui DirectX9 - Borderless", WS_POPUP, (desktop.right / 2) - (gui::size.x / 2), (desktop.bottom / 2) - (gui::size.y / 2), gui::size.x, gui::size.y, NULL, NULL, wc.hInstance, NULL);
+    HWND hwnd = ::CreateWindow(wc.lpszClassName, L"OrkGui", WS_POPUP, (desktop.right / 2) - (gui::size.x / 2), (desktop.bottom / 2) - (gui::size.y / 2), gui::size.x, gui::size.y, NULL, NULL, wc.hInstance, NULL);
 
     MARGINS margins = { -1 };
     DwmExtendFrameIntoClientArea(hwnd, &margins);
+
+    RenderWindowBlur(hwnd, false); // change false to true to get blur //FIXME: add rounded blur corners
+
+    //SetWindowRgn(hwnd, CreateRoundRectRgn(0, 0, gui::size.x+1, gui::size.y+1, 6, 6), true);
 
     // Initialize Direct3D
     if (!CreateDeviceD3D(hwnd))
@@ -80,30 +114,69 @@ int main(int, char**)
     style.WindowBorderSize = 1;
     style.FrameBorderSize = 1;
 
-    style.Colors[ImGuiCol_WindowBg]     = ImVec4(0.06f, 0.06f, 0.06f, 0.75f);
-    style.Colors[ImGuiCol_ChildBg]      = ImVec4(0.06f, 0.06f, 0.06f, 1.00f);
+    style.Colors[ImGuiCol_WindowBg]                 = ImVec4(0.06f, 0.06f, 0.06f, 0.75f);
+    style.Colors[ImGuiCol_ChildBg]          	    = ImVec4(0.06f, 0.06f, 0.06f, 1.00f);
+    style.Colors[ImGuiCol_Text]                     = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    style.Colors[ImGuiCol_TextDisabled]             = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+    style.Colors[ImGuiCol_PopupBg]                  = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+    style.Colors[ImGuiCol_Border]                   = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+    style.Colors[ImGuiCol_BorderShadow]             = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    style.Colors[ImGuiCol_FrameBg]                  = ImVec4(0.12f, 0.12f, 0.12f, 0.94f);
+    style.Colors[ImGuiCol_FrameBgHovered]           = ImVec4(0.45f, 0.45f, 0.45f, 0.85f);
+    style.Colors[ImGuiCol_FrameBgActive]            = ImVec4(0.63f, 0.63f, 0.63f, 0.63f);
+    style.Colors[ImGuiCol_TitleBg]                  = ImVec4(0.13f, 0.13f, 0.13f, 0.99f);
+    style.Colors[ImGuiCol_TitleBgActive]            = ImVec4(0.13f, 0.13f, 0.13f, 0.99f);
+    style.Colors[ImGuiCol_TitleBgCollapsed]         = ImVec4(0.05f, 0.05f, 0.05f, 0.79f);
+    style.Colors[ImGuiCol_MenuBarBg]                = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+    style.Colors[ImGuiCol_ScrollbarBg]              = ImVec4(0.13f, 0.13f, 0.13f, 0.99f);
+    style.Colors[ImGuiCol_ScrollbarGrab]            = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
+    style.Colors[ImGuiCol_ScrollbarGrabHovered]     = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
+    style.Colors[ImGuiCol_ScrollbarGrabActive]      = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+    style.Colors[ImGuiCol_CheckMark]                = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    style.Colors[ImGuiCol_SliderGrab]               = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
+    style.Colors[ImGuiCol_SliderGrabActive]         = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
+    style.Colors[ImGuiCol_Button]                   = ImVec4(0.12f, 0.12f, 0.12f, 0.94f);
+    style.Colors[ImGuiCol_ButtonHovered]            = ImVec4(0.34f, 0.34f, 0.35f, 0.89f);
+    style.Colors[ImGuiCol_ButtonActive]             = ImVec4(0.21f, 0.21f, 0.21f, 0.81f);
+    style.Colors[ImGuiCol_Header]                   = ImVec4(0.12f, 0.12f, 0.12f, 0.94f);
+    style.Colors[ImGuiCol_HeaderHovered]            = ImVec4(0.34f, 0.34f, 0.35f, 0.89f);
+    style.Colors[ImGuiCol_HeaderActive]             = ImVec4(0.12f, 0.12f, 0.12f, 0.94f);
+    style.Colors[ImGuiCol_Separator]                = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+    style.Colors[ImGuiCol_SeparatorHovered]         = ImVec4(0.26f, 0.59f, 0.98f, 0.78f);
+    style.Colors[ImGuiCol_SeparatorActive]          = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+    style.Colors[ImGuiCol_ResizeGrip]               = ImVec4(0.26f, 0.59f, 0.98f, 0.25f);
+    style.Colors[ImGuiCol_ResizeGripHovered]        = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
+    style.Colors[ImGuiCol_ResizeGripActive]         = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+    style.Colors[ImGuiCol_PlotLines]                = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+    style.Colors[ImGuiCol_PlotLinesHovered]         = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+    style.Colors[ImGuiCol_PlotHistogram]            = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+    style.Colors[ImGuiCol_PlotHistogramHovered]     = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+    style.Colors[ImGuiCol_TextSelectedBg]           = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
 
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(hwnd);
     ImGui_ImplDX9_Init(gui::g_pd3dDevice);
 
     io.Fonts->AddFontDefault();
-    
-    /*
-    static const ImWchar icons_ranges[] = { ICON_MIN_MD, ICON_MAX_16_MD, 0 };
-    ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
-    io.Fonts->AddFontFromFileTTF(FONT_ICON_FILE_NAME_MD, 14.0f, &icons_config, icons_ranges);
 
-    int my_image_width = 0;
-    int my_image_height = 0;
-    PDIRECT3DTEXTURE9 my_texture = NULL;
-    bool ret = LoadTextureFromFile("texture/bg.png", &my_texture, &my_image_width, &my_image_height);
+    // merge in icons from Font Awesome
+    static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
+    ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
+    ImFont* FontAwesome = io.Fonts->AddFontFromMemoryCompressedTTF(fa6_solid_compressed_data, fa6_solid_compressed_size, 14.f, &icons_config, icons_ranges);
+
+    /*
+    PDIRECT3DTEXTURE9 bg_texture = NULL;
+    bool ret = LoadTextureFromFile("bg.png", &bg_texture);
     IM_ASSERT(ret);
     */
 
     // Main loop
     bool loaderOpen = true;
-    while (loaderOpen)
+    if (WinVersion::GetVersion(info) && info.Major <= 6)
+    {
+        MessageBox(hwnd, L"your operating system is not supported", L"Error", MB_ICONERROR);
+    }
+    else while ( loaderOpen && (info.Major > 6) )
     {
         MSG msg;
         while (::PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
@@ -127,19 +200,21 @@ int main(int, char**)
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(((windows_title_height - ImGui::CalcTextSize(GUI_TITLE).y) / 2) , ((windows_title_height - ImGui::CalcTextSize(GUI_TITLE).y) / 2)));
 		ImGui::Begin(GUI_TITLE, &loaderOpen, main_window_flags);
 		ImGui::PopStyleVar();
-        ImVec2 pos = {
-            ImGui::GetCursorScreenPos().x - ImGui::GetStyle().WindowPadding.x
-            ,
-            ImGui::GetCursorScreenPos().y - ImGui::GetStyle().WindowPadding.y
-        };
-        //ImGui::GetBackgroundDrawList()->AddImageRounded((void*)my_texture, ImVec2(pos.x, pos.y - windows_title_height), ImVec2(pos.x + gui::size.x, pos.y + gui::size.y - windows_title_height), ImVec2(0, 0), ImVec2(1, 1), ImU32(IM_COL32(225, 225, 225, 225)), ImGui::GetStyle().WindowRounding+2);
         {
-			ImGui::Text("dear imgui (V%s) (%d)", IMGUI_VERSION, IMGUI_VERSION_NUM);
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            auto BackgroundDrawList = ImGui::GetBackgroundDrawList();
+            auto WindowDrawList = ImGui::GetWindowDrawList();
+            auto WindowSize = ImGui::GetWindowSize();
+            auto WindowPos = ImGui::GetWindowPos();
+            auto WinPos = ImGui::GetWindowPos();
+            //ImGui::GetBackgroundDrawList()->AddImageRounded((void*)bg_texture, ImVec2(WindowPos.x, WindowPos.y + windows_title_height), ImVec2(WindowPos.x + gui::size.x, WindowPos.y + gui::size.y), ImVec2(0, 0), ImVec2(1, 1), ImU32(IM_COL32(225, 225, 225, 225)), ImGui::GetStyle().WindowRounding*(4/3), ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersBottomRight);
+            {
+                ImGui::Text(ICON_FA_WINDOW_MAXIMIZE" dear imgui (V%s) (%d)", IMGUI_VERSION, IMGUI_VERSION_NUM);
+                ImGui::Text(ICON_FA_COMPUTER" Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            }
         }
 		ImGui::End();
-
         //ImGui::ShowDemoWindow();
+        // 
         // Rendering
         ImGui::EndFrame();
         gui::g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
