@@ -1,4 +1,4 @@
-# ImGui-BorderLess
+# ImGui-Desktop
 A simple ImGui panel with no window borders
 ## Features
 - BorderLess window
