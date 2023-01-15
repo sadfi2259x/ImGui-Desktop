@@ -55,6 +55,32 @@ void RenderWindowBlur(HWND hwnd, bool boolean)
     }
 }
 
+ImFont* AddCustomDefaultFont(const ImFontConfig* font_cfg_template)
+{
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    ImFontConfig font_cfg = font_cfg_template ? *font_cfg_template : ImFontConfig();
+    if (!font_cfg_template)
+    {
+        font_cfg.OversampleH = font_cfg.OversampleV = 1;
+        font_cfg.PixelSnapH = true;
+    }
+    if (font_cfg.SizePixels <= 0.0f)
+        font_cfg.SizePixels = 13.0f * 1.0f;
+    if (font_cfg.Name[0] == '\0')
+        ImFormatString(font_cfg.Name, IM_ARRAYSIZE(font_cfg.Name), "ProggyClean.ttf, %dpx", (int)font_cfg.SizePixels);
+    font_cfg.EllipsisChar = (ImWchar)0x0085;
+    font_cfg.GlyphOffset.y = 1.0f * IM_FLOOR(font_cfg.SizePixels / 13.0f);  // Add +1 offset per 13 units
+
+    //const char* ttf_compressed_base85 = GetDefaultCompressedFontDataTTFBase85();
+    const ImWchar* glyph_ranges = font_cfg.GlyphRanges != NULL ? font_cfg.GlyphRanges : io.Fonts->GetGlyphRangesDefault();
+    //ImFont* font = io.Fonts->AddFontFromMemoryCompressedTTF(trebucbd_compressed_data, trebucbd_compressed_size, font_cfg.SizePixels, &font_cfg, glyph_ranges);
+    ImFont* font = io.Fonts->AddFontFromMemoryCompressedTTF(trebucbd_compressed_data, trebucbd_compressed_size, 14, nullptr, glyph_ranges);
+    return font;
+}
+
+int nav_num = 0;
+
 // Main code
 int main(int, char**)
 {
@@ -72,7 +98,7 @@ int main(int, char**)
     MARGINS margins = { -1 };
     DwmExtendFrameIntoClientArea(hwnd, &margins);
 
-    RenderWindowBlur(hwnd, false); // change false to true to get blur //FIXME: add rounded blur corners
+    RenderWindowBlur(hwnd, true);
 
     //SetWindowRgn(hwnd, CreateRoundRectRgn(0, 0, gui::size.x+1, gui::size.y+1, 6, 6), true);
 
@@ -99,20 +125,20 @@ int main(int, char**)
     
     ImGuiStyle& style = ImGui::GetStyle();
 
-    style.WindowRounding = 6;
+    style.WindowRounding = 4;
     style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
     style.ChildRounding = 3;
     style.FrameRounding = 3;
     style.ItemSpacing = ImVec2(5.0f, 5.0f);
-    style.ScrollbarSize = 13.0;
+    style.ScrollbarSize = 13.f;
     style.ScrollbarRounding = 1;
     style.GrabMinSize = 8.0;
     style.GrabRounding = 3;
     style.WindowPadding = ImVec2(5.0f, 5.0f);
     style.FramePadding = ImVec2(2.5f, 3.5f);
-    style.ButtonTextAlign = ImVec2(0.02f, 0.4f);
-    style.WindowBorderSize = 1;
-    style.FrameBorderSize = 1;
+    style.ButtonTextAlign = ImVec2(0.5f, 0.6f);
+    style.WindowBorderSize = 0;
+    style.FrameBorderSize = 0;
 
     style.Colors[ImGuiCol_WindowBg]                 = ImVec4(0.06f, 0.06f, 0.06f, 0.75f);
     style.Colors[ImGuiCol_ChildBg]          	    = ImVec4(0.06f, 0.06f, 0.06f, 1.00f);
@@ -157,12 +183,15 @@ int main(int, char**)
     ImGui_ImplWin32_Init(hwnd);
     ImGui_ImplDX9_Init(gui::g_pd3dDevice);
 
-    io.Fonts->AddFontDefault();
+    AddCustomDefaultFont(nullptr);
 
     // merge in icons from Font Awesome
     static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
     ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
     ImFont* FontAwesome = io.Fonts->AddFontFromMemoryCompressedTTF(fa6_solid_compressed_data, fa6_solid_compressed_size, 14.f, &icons_config, icons_ranges);
+    ImFont* FontAwesomeBig = io.Fonts->AddFontFromMemoryCompressedTTF(fa6_solid_compressed_data, fa6_solid_compressed_size, 19.f, nullptr, icons_ranges);
+
+    ImFont* TitleFont = io.Fonts->AddFontFromMemoryCompressedTTF(trebucbd_compressed_data, trebucbd_compressed_size, 30, nullptr, io.Fonts->GetGlyphRangesDefault());
 
     /*
     PDIRECT3DTEXTURE9 bg_texture = NULL;
@@ -193,7 +222,7 @@ int main(int, char**)
         ImGui_ImplDX9_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
-        ImGuiWindowFlags main_window_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus;
+        ImGuiWindowFlags main_window_flags = ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus;
 
 		ImGui::SetNextWindowPos({ 0, 0 });
 		ImGui::SetNextWindowSize(gui::size);
@@ -202,14 +231,112 @@ int main(int, char**)
 		ImGui::PopStyleVar();
         {
             auto BackgroundDrawList = ImGui::GetBackgroundDrawList();
+            auto ForegroundDrawList = ImGui::GetForegroundDrawList();
             auto WindowDrawList = ImGui::GetWindowDrawList();
             auto WindowSize = ImGui::GetWindowSize();
             auto WindowPos = ImGui::GetWindowPos();
-            auto WinPos = ImGui::GetWindowPos();
-            //ImGui::GetBackgroundDrawList()->AddImageRounded((void*)bg_texture, ImVec2(WindowPos.x, WindowPos.y + windows_title_height), ImVec2(WindowPos.x + gui::size.x, WindowPos.y + gui::size.y), ImVec2(0, 0), ImVec2(1, 1), ImU32(IM_COL32(225, 225, 225, 225)), ImGui::GetStyle().WindowRounding*(4/3), ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersBottomRight);
+            auto CursorPos = ImGui::GetCursorPos();
+            //BackgroundDrawList->AddImageRounded((void*)bg_texture, ImVec2(WindowPos.x, WindowPos.y + windows_title_height), ImVec2(WindowPos.x + gui::size.x, WindowPos.y + gui::size.y), ImVec2(0, 0), ImVec2(1, 1), ImU32(IM_COL32(225, 225, 225, 225)), ImGui::GetStyle().WindowRounding*(4/3), ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersBottomRight);
+            //BackgroundDrawList->AddRectFilled(WindowPos, ImVec2(WindowPos.x + WindowSize.x, WindowPos.y + windows_title_height), IM_COL32(13, 13, 12, 255), style.WindowRounding, ImDrawFlags_RoundCornersTop); // Title
+            //BackgroundDrawList->AddRectFilled(ImVec2(WindowPos.x, WindowPos.y + windows_title_height), ImVec2(WindowPos.x + windows_sidebar_width, WindowPos.y + WindowSize.y), IM_COL32(13, 13, 12, 255), style.WindowRounding, ImDrawFlags_RoundCornersBottomLeft); // sidebar
+            BackgroundDrawList->AddRectFilled(WindowPos, ImVec2(WindowPos.x + WindowSize.x, WindowPos.y + WindowSize.y), IM_COL32(13, 13, 12, 255/2), style.WindowRounding); // MainBg
+            BackgroundDrawList->AddRectFilled(ImVec2(WindowPos.x + windows_sidebar_width, WindowPos.y + windows_title_height), ImVec2(WindowPos.x + WindowSize.x, WindowPos.y + WindowSize.y), IM_COL32(25, 24, 24, 255), style.WindowRounding, ImDrawFlags_RoundCornersBottomRight | ImDrawFlags_RoundCornersTopLeft); // Main
+            ImGui::SetCursorPos(ImVec2(WindowPos.x + style.ItemSpacing.x, WindowPos.y + style.ItemSpacing.y));
             {
-                ImGui::Text(ICON_FA_WINDOW_MAXIMIZE" dear imgui (V%s) (%d)", IMGUI_VERSION, IMGUI_VERSION_NUM);
-                ImGui::Text(ICON_FA_COMPUTER" Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+                ImGui::PushFont(TitleFont);
+                ImGui::Text(" " GUI_TITLE);
+                ImGui::PopFont();
+                ImGui::SameLine(WindowSize.x - (windows_title_height - style.WindowPadding.x));
+                {
+                    ImGui::PushFont(FontAwesomeBig);
+                    if (ImGui::Button(ICON_FA_XMARK, ImVec2(windows_title_height - style.WindowPadding.x * 2, windows_title_height - style.WindowPadding.x * 2)))
+                        loaderOpen = false;
+                    ImGui::PopFont();
+                }
+            }
+            ImGui::SetCursorPosY(windows_title_height + style.ItemSpacing.y);
+            {
+                ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 0.f);
+                ImGui::BeginChild("sidebar", ImVec2(windows_title_height - style.WindowPadding.x*2, 0), false, ImGuiWindowFlags_NoBackground);
+                {
+                    auto nav_btn_size = ImVec2(windows_title_height - style.WindowPadding.x * 2, windows_title_height - style.WindowPadding.x * 2);
+                    ImAdd::NavigationRadio(ICON_FA_HOUSE, nav_btn_size, 0, &nav_num);
+                    ImAdd::NavigationRadio(ICON_FA_USER, nav_btn_size, 1, &nav_num);
+                    ImAdd::NavigationRadio(ICON_FA_EYE, nav_btn_size, 2, &nav_num);
+                    ImAdd::NavigationRadio(ICON_FA_CROSSHAIRS, nav_btn_size, 3, &nav_num);
+                    ImAdd::NavigationRadio(ICON_FA_CAR, nav_btn_size, 4, &nav_num);
+                    ImAdd::NavigationRadio(ICON_FA_GAMEPAD, nav_btn_size, 5, &nav_num);
+                    ImAdd::NavigationRadio(ICON_FA_SERVER, nav_btn_size, 6, &nav_num);
+                    ImAdd::NavigationRadio(ICON_FA_DATABASE, nav_btn_size, 7, &nav_num);
+                    ImAdd::NavigationRadio(ICON_FA_DOWNLOAD, nav_btn_size, 8, &nav_num);
+                    ImAdd::NavigationRadio(ICON_FA_SHIELD_HALVED, nav_btn_size, 9, &nav_num);
+                    ImAdd::NavigationRadio(ICON_FA_GEAR, nav_btn_size, 10, &nav_num);
+                }
+                ImGui::EndChild();
+                ImGui::PopStyleVar();
+            }
+            ImGui::SetCursorPos(ImVec2(WindowPos.x + windows_sidebar_width + style.WindowPadding.x, WindowPos.y + windows_title_height + style.WindowPadding.y));
+            {
+                ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 0.f);
+                ImGui::BeginChild("content", ImVec2(0, 0), false, ImGuiWindowFlags_NoBackground);
+                {
+                    if (nav_num == 0)
+                    {
+                        ImGui::Text("hello world !");
+                        ImGui::Button("button", ImVec2(-0.1, 0));
+                        ImAdd::ToggleButton("toggle1", &test_bool1, true);
+                        ImAdd::ToggleButton("toggle2", &test_bool2, false);
+                        ImAdd::TextURL("google link", ICON_FA_LINK "  Open in browser\n\"https:://www.google.com\"", L"https:://www.google.com", true);
+                        ImAdd::TextURL("google link", ICON_FA_LINK "  Open in browser\n\"https:://www.google.com\"", L"https:://www.google.com", false);
+                    }
+                    else if (nav_num == 1)
+                    {
+
+                    }
+                    else if (nav_num == 2)
+                    {
+
+                    }
+                    else if (nav_num == 3)
+                    {
+
+                    }
+                    else if (nav_num == 4)
+                    {
+
+                    }
+                    else if (nav_num == 5)
+                    {
+
+                    }
+                    else if (nav_num == 6)
+                    {
+
+                    }
+                    else if (nav_num == 7)
+                    {
+
+                    }
+                    else if (nav_num == 8)
+                    {
+
+                    }
+                    else if (nav_num == 9)
+                    {
+
+                    }
+                    else if (nav_num == 10)
+                    {
+
+                    }
+                    else
+                    {
+                        ImGui::Text("404");
+                    }
+
+                }
+                ImGui::EndChild();
+                ImGui::PopStyleVar();
             }
         }
 		ImGui::End();

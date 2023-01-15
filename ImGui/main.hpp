@@ -10,6 +10,8 @@
 #include "addons/blur/blur.hpp"
 
 #include "font/IconsFontAwesome6.h"
+#include "font/Inter_Regular.h"
+#include "font/trebucbd.h"
 
 #include <d3d9.h>
 #include <d3dx9.h>
@@ -17,7 +19,6 @@
 
 #pragma comment (lib, "d3dx9.lib")
 #pragma comment (lib, "d3d9.lib")	
-#pragma comment(lib, "ntdll")
 
 #include <windows.h>
 #include <dwmapi.h>
@@ -26,6 +27,9 @@
 #include <tchar.h>
 
 using namespace std;
+
+#include "winver/WinVersion.h"
+VersionInfo info;
 
 // Forward declarations of helper functions
 bool CreateDeviceD3D(HWND hWnd);
@@ -44,13 +48,17 @@ namespace gui
 	static D3DPRESENT_PARAMETERS    g_d3dpp = {};
 
 	static POINTS					guiPosition = { };
-	static ImVec2					size = { 500 , 300 };
+	static ImVec2					size = { 512 , 430 };
 }
 
-static int windows_title_height = 24;
+static int windows_title_height = 40;
+static int windows_sidebar_width = 40; //128
 static bool block_moving = false;
 
-#define GUI_TITLE "ImGui Menu"
+#define GUI_TITLE "ImGui Menu - Designed by Rex.08"
+
+bool test_bool1 = true;
+bool test_bool2 = true;
 
 /*
 ImDrawFlags_RoundCornersTopLeft
@@ -58,47 +66,3 @@ ImDrawFlags_RoundCornersTopRight
 ImDrawFlags_RoundCornersBottomRight
 ImDrawFlags_RoundCornersBottomLeft
 */
-
-struct VersionInfo
-{
-	VersionInfo() : Major(0), Minor(0), BuildNum(0) {}
-	unsigned int Major;
-	unsigned int Minor;
-	unsigned int BuildNum;
-};
-VersionInfo info;
-
-class WinVersion
-{
-public:
-	static bool GetVersion(VersionInfo& info);
-	static bool IsBuildNumGreaterOrEqual(unsigned int buildNumber);
-};
-
-extern "C" NTSTATUS __stdcall RtlGetVersion(OSVERSIONINFOEXW * lpVersionInformation);
-
-bool WinVersion::GetVersion(VersionInfo& info)
-{
-    OSVERSIONINFOEXW osv;
-    osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEXW);
-    if (RtlGetVersion(&osv) == 0)
-    {
-        info.Major = osv.dwMajorVersion;
-        info.Minor = osv.dwMinorVersion;
-        info.BuildNum = osv.dwBuildNumber;
-        if (osv.dwBuildNumber >= 22000)
-            info.Major = 11;
-        return true;
-    }
-    return false;
-}
-
-bool WinVersion::IsBuildNumGreaterOrEqual(unsigned int buildNumber)
-{
-    VersionInfo info;
-    if (GetVersion(info))
-    {
-        return (buildNumber >= info.BuildNum);
-    }
-    return false;
-}

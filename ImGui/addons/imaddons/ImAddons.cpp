@@ -4,6 +4,14 @@ This is a simple items addons for Dear ImGui
 
 #include "ImAddons.h"
 
+void AddUnderLine(ImColor col_)
+{
+    ImVec2 min = ImGui::GetItemRectMin();
+    ImVec2 max = ImGui::GetItemRectMax();
+    min.y = max.y;
+    ImGui::GetWindowDrawList()->AddLine(min, max, col_, 1.0f);
+}
+
 bool ImAdd::LoadTextureFromFile(const char* filename, PDIRECT3DTEXTURE9* out_texture, int* out_width, int* out_height)
 {
     // Load texture from disk
@@ -26,15 +34,31 @@ void ImAdd::ToggleButton(const char* str_id, bool* v, bool label)
     ImVec2 p = ImGui::GetCursorScreenPos();
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
+    /*
+    float height = ImGui::GetFrameHeight();
+    float width = height * 1.55f;
+    float radius = height * 0.50f;
+    */
+
     float height = 20;
     float width = 44;
     float border = 2;
     float radius = 5 * 2;
     float rounding = 10.0;
-    //float rounding = int_slider; // remove me later
+    float ANIM_SPEED = 0.1f;
 
-    if (ImGui::InvisibleButton(str_id, ImVec2(width, height)))
+    ImGui::InvisibleButton(str_id, ImVec2(width, height));
+    if (ImGui::IsItemClicked())
         *v = !*v;
+
+    float t = *v ? 1.0f : 0.0f;
+
+    ImGuiContext& g = *GImGui;
+    if (g.LastActiveId == g.CurrentWindow->GetID(str_id))// && g.LastActiveIdTimer < ANIM_SPEED)
+    {
+        float t_anim = ImSaturate(g.LastActiveIdTimer / ANIM_SPEED);
+        t = *v ? (t_anim) : (1.0f - t_anim);
+    }
 
     ImU32 col_bg;
     ImU32 cir_bg;
@@ -75,7 +99,9 @@ void ImAdd::ToggleButton(const char* str_id, bool* v, bool label)
         draw_list->AddRectFilled(ImVec2(p.x + border, p.y + border), ImVec2((p.x + width) - border, (p.y + height) - border), col_bg, rounding);
     }
 
-    draw_list->AddCircleFilled(ImVec2(*v ? (p.x + width - radius) : (p.x + radius), p.y + radius), radius - ((height - radius) / 2), IM_COL32(255, 255, 255, 255));
+    //draw_list->AddCircleFilled(ImVec2((p.x + width - radius), p.y + radius), radius - ((height - radius) / 2), IM_COL32(255, 255, 255, 255));
+    
+    draw_list->AddCircleFilled(ImVec2(p.x + radius + t * (width - radius * 2.0f), p.y + radius), radius - ((height - radius) / 2), IM_COL32(255, 255, 255, 255));
 
     if (label)
     {
@@ -302,4 +328,49 @@ bool ImAdd::Knob(const char* label, float* p_value, float v_min, float v_max)
     }
 
     return value_changed;
+}
+
+void ImAdd::NavigationRadio(const char* text, ImVec2 size, int id, int* t_ids)
+{
+    if (id == *t_ids)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+        ImGui::Button(text, size);
+        ImGui::PopStyleColor(3);
+    }
+    else
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+        if (ImGui::Button(text, size))
+        {
+            *t_ids = id;
+        }
+        ImGui::PopStyleColor();
+    }
+}
+
+// hyperlink urls
+void ImAdd::TextURL(const char* name_, const char* popup, LPCWSTR URL_, bool underlined)
+{
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.00f, 0.60f, 1.00f, 1.00f));
+    ImGui::Text(name_);
+    ImGui::PopStyleColor();
+    if (ImGui::IsItemHovered())
+    {
+        if (ImGui::IsMouseClicked(0))
+        {
+            ShellExecute(NULL, L"open", URL_, nullptr, nullptr, SW_HIDE);
+        }
+        ImGui::SetTooltip(popup);
+    }
+    /*
+    else
+    {
+        AddUnderLine(ImGui::GetStyle().Colors[ImGuiCol_Button]);
+    }
+    */
+    if (underlined)
+        AddUnderLine(ImVec4(0.00f, 0.45f, 1.00f, 1.00f));
 }

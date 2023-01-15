@@ -16,6 +16,8 @@ namespace ImAdd
     // voids
     IMGUI_API void          ToggleButton(const char* str_id, bool* v, bool label);
     IMGUI_API void          ToggleButtonLabel(const char* str_id, const char* text, bool* v, bool label);
+    IMGUI_API void          NavigationRadio(const char* text, ImVec2 size, int id, int* t_ids);
+    IMGUI_API void          TextURL(const char* name_, const char* popup, LPCWSTR URL_, bool underlined);
 
     // bools
     IMGUI_API bool          LoadTextureFromFile(const char* filename, PDIRECT3DTEXTURE9* out_texture, int* out_width, int* out_height);
